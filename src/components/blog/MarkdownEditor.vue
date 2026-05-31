@@ -1,36 +1,56 @@
 <!--
   @file MarkdownEditor.vue
-  @description Markdown 编辑 + 预览组件，模拟 md-editor-v3 的基础行为。
+  @description Markdown 编辑组件，基于 md-editor-v3 提供编辑与实时预览。
 -->
 <script setup lang="ts">
-import MarkdownViewer from './MarkdownViewer.vue'
+import { computed } from 'vue'
+import { MdEditor } from 'md-editor-v3'
+import { useDarkMode } from '../../composables/useDarkMode'
 
-defineProps<{
+const props = defineProps<{
   modelValue: string
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+const { isDark } = useDarkMode()
+
+const editorTheme = computed(() => (isDark.value ? 'dark' : 'light'))
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 md:flex-row">
-    <div class="flex-1">
-      <div class="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Markdown 编辑</span>
-        <span>支持标题 / 列表 / 代码块等基础语法</span>
-      </div>
-      <textarea
-        :value="modelValue"
-        @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
-        class="h-64 w-full resize-y rounded-md border bg-background p-2 text-xs outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
-        placeholder="# 在这里输入 Markdown 内容…"
-      />
-    </div>
-    <div class="flex-1 rounded-md border bg-card/60 p-3">
-      <div class="mb-1 text-xs text-muted-foreground">实时预览</div>
-      <MarkdownViewer :content="modelValue" />
-    </div>
-  </div>
+  <MdEditor
+    :model-value="props.modelValue"
+    :theme="editorTheme"
+    :preview-theme="editorTheme"
+    language="zh-CN"
+    :toolbars="[
+      'bold',
+      'italic',
+      'strikeThrough',
+      'title',
+      '-',
+      'unorderedList',
+      'orderedList',
+      'task',
+      'codeRow',
+      'code',
+      'link',
+      'image',
+      'table',
+      '-',
+      'revoke',
+      'next',
+      'save',
+      '=',
+      'preview',
+      'fullscreen',
+      'pageFullscreen',
+    ]"
+    style="height: 500px"
+    @on-change="(v: string) => emit('update:modelValue', v)"
+    @on-save="(v: string) => emit('update:modelValue', v)"
+  />
 </template>
