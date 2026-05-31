@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../authStore'
+import { decodeMockJWT, isTokenExpired } from '../../lib/jwt'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -27,8 +28,32 @@ describe('authStore', () => {
       const ok = await store.login('admin', '123456')
       expect(ok).toBe(true)
       expect(store.isAuthenticated).toBe(true)
-      expect(store.token).toContain('mock-jwt-token-')
+      // token 应为三段式 JWT 结构
+      expect(store.token).toBeTruthy()
+      const parts = store.token!.split('.')
+      expect(parts).toHaveLength(3)
       expect(store.user?.username).toBe('admin')
+    })
+
+    it('生成的 token 应为可解码的 JWT 结构', async () => {
+      const store = useAuthStore()
+      await store.login('admin', '123456')
+
+      const payload = decodeMockJWT(store.token!)
+      expect(payload).toBeTruthy()
+      expect(payload!.sub).toBe('admin')
+      expect(payload!.iat).toBeTypeOf('number')
+      expect(payload!.exp).toBeTypeOf('number')
+      // 过期时间应在签发时间之后约 24 小时
+      expect(payload!.exp - payload!.iat).toBe(24 * 60 * 60)
+    })
+
+    it('token 过期检测应正常工作', async () => {
+      const store = useAuthStore()
+      await store.login('admin', '123456')
+
+      // 刚创建的 token 不应过期
+      expect(isTokenExpired(store.token!)).toBe(false)
     })
 
     it('正确的 demo 凭证应登录成功', async () => {

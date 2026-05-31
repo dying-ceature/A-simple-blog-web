@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { createMockJWT } from '../lib/jwt'
 
 export interface AuthUser {
   username: string
@@ -28,7 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
       return false
     }
 
-    const fakeToken = 'mock-jwt-token-' + Date.now().toString()
+    const fakeToken = createMockJWT({ sub: username })
     const authUser: AuthUser = { username }
 
     if (typeof window !== 'undefined') {
