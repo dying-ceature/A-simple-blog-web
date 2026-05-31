@@ -1,21 +1,33 @@
 /**
  * @file useDarkMode.ts
- * @description 组合式函数，用于封装深浅色主题切换逻辑，模仿 VueUse 中 useDark 的行为。
+ * @description 深色模式组合式函数，基于 VueUse useDark / useToggle 封装。
  */
-
 import { computed } from 'vue'
-import { useUIStore } from '../stores/uiStore'
+import { useDark, useToggle } from '@vueuse/core'
 
 /**
  * @description 深色模式组合式函数，返回当前主题与切换方法。
+ * 使用 VueUse useDark 管理 <html> 的 dark class 与 localStorage 持久化。
  */
 export function useDarkMode() {
-  const uiStore = useUIStore()
+  const isDark = useDark({
+    storageKey: 'theme',
+    valueDark: 'dark',
+    valueLight: 'light',
+  })
+
+  const toggleTheme = useToggle(isDark)
+
+  const theme = computed(() => (isDark.value ? 'dark' : 'light'))
+
+  function setTheme(t: 'light' | 'dark') {
+    isDark.value = t === 'dark'
+  }
 
   return {
-    theme: computed(() => uiStore.theme),
-    setTheme: uiStore.setTheme,
-    toggleTheme: uiStore.toggleTheme,
-    isDark: computed(() => uiStore.theme === 'dark'),
+    theme,
+    setTheme,
+    toggleTheme,
+    isDark,
   }
 }
