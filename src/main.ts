@@ -12,6 +12,12 @@ import 'md-editor-v3/lib/style.css'
 
 const app = createApp(App)
 
+// 全局错误处理器 —— 最后的安全网
+app.config.errorHandler = (err, _instance, info) => {
+  console.error('[Vue Global Error]', err)
+  console.error('[Error Info]', info)
+}
+
 app.use(createPinia())
 app.use(router)
 

@@ -76,7 +76,11 @@ function handlePageChange(nextPage: number) {
 }
 
 onMounted(() => {
-  initBlogDemoData()
+  try {
+    initBlogDemoData()
+  } catch (e) {
+    console.error('[HomePage] Failed to initialize demo data:', e)
+  }
   categoryStore.fetchAll()
 })
 

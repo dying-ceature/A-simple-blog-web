@@ -38,9 +38,9 @@ function nowISO(): string {
  */
 function getStoredPosts(): Post[] {
   if (typeof window === 'undefined') return []
-  const raw = window.localStorage.getItem('blog_posts')
-  if (!raw) return []
   try {
+    const raw = window.localStorage.getItem('blog_posts')
+    if (!raw) return []
     const parsed = JSON.parse(raw) as Array<Partial<Post>>
     // 兼容旧版本数据：没有 status 的一律视为已发布
     const normalized = parsed.map((p) => ({
@@ -61,7 +61,11 @@ function getStoredPosts(): Post[] {
  */
 function setStoredPosts(posts: Post[]) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem('blog_posts', JSON.stringify(posts))
+  try {
+    window.localStorage.setItem('blog_posts', JSON.stringify(posts))
+  } catch (e) {
+    console.error('[blogStorage] Failed to store posts:', e)
+  }
 }
 
 /**
@@ -69,9 +73,9 @@ function setStoredPosts(posts: Post[]) {
  */
 function getStoredCategories(): Category[] {
   if (typeof window === 'undefined') return []
-  const raw = window.localStorage.getItem('blog_categories')
-  if (!raw) return []
   try {
+    const raw = window.localStorage.getItem('blog_categories')
+    if (!raw) return []
     return JSON.parse(raw) as Category[]
   } catch {
     return []
@@ -83,7 +87,11 @@ function getStoredCategories(): Category[] {
  */
 function setStoredCategories(categories: Category[]) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem('blog_categories', JSON.stringify(categories))
+  try {
+    window.localStorage.setItem('blog_categories', JSON.stringify(categories))
+  } catch (e) {
+    console.error('[blogStorage] Failed to store categories:', e)
+  }
 }
 
 /**
