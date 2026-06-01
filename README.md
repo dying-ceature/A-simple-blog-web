@@ -5,7 +5,7 @@
 [![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vuedotjs)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?logo=vite)](https://vitejs.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-80%20passed-success)]()
+[![Tests](https://img.shields.io/badge/tests-74%20passed-success)]()
 
 ---
 
@@ -42,11 +42,11 @@
 | 语言 | TypeScript 5.7 | 严格模式 |
 | 构建 | Vite 6 | 极速 HMR |
 | 路由 | Vue Router 4 | Hash 模式 + 懒加载 + 路由守卫 |
-| 状态管理 | Pinia 2 | 4 个 Store（auth / post / category / ui） |
+| 状态管理 | Pinia 2 | 3 个 Store（auth / post / category） |
 | UI | Tailwind CSS 3 | shadcn/ui 风格设计系统 |
 | Markdown | md-editor-v3 | CodeMirror 6 内核，分屏编辑+预览 |
 | HTTP | Axios | 请求/响应拦截器，自动 Token 注入 |
-| 工具库 | VueUse | useDark / useToggle 管理主题 |
+| 工具库 | VueUse | useDark + createSharedComposable 管理主题 |
 | 测试 | Vitest 4 | 80 个单元测试，jsdom 环境 |
 | 组件测试 | @vue/test-utils 2 | 2.4.x |
 
@@ -75,8 +75,7 @@ vue3-blog/
 │   ├── stores/                    # Pinia 状态管理
 │   │   ├── authStore.ts           #   认证（登录/登出/JWT 持久化）
 │   │   ├── postStore.ts           #   文章 CRUD + 分页
-│   │   ├── categoryStore.ts       #   分类 CRUD
-│   │   └── uiStore.ts             #   主题切换
+│   │   └── categoryStore.ts       #   分类 CRUD
 │   │
 │   ├── services/
 │   │   └── blogStorage.ts         # localStorage 数据模拟层（文章/分类增删改查）
@@ -91,7 +90,7 @@ vue3-blog/
 │   │   └── jwt.ts                 # 模拟 JWT（create / decode / isExpired）
 │   │
 │   ├── composables/
-│   │   └── useDarkMode.ts         # 深色模式（VueUse useDark/useToggle）
+│   │   └── useDarkMode.ts         # 深色模式共享单例（VueUse useDark + createSharedComposable）
 │   │
 │   ├── components/
 │   │   ├── common/
@@ -198,10 +197,9 @@ npm run test:watch
 | `authStore.test.ts` | 认证 Store + JWT | 13 |
 | `postStore.test.ts` | 文章 Store | 12 |
 | `categoryStore.test.ts` | 分类 Store | 8 |
-| `uiStore.test.ts` | 主题 Store + DOM | 6 |
 | `blogApi.test.ts` | Axios API 函数 | 9 |
 
-**总计：80 tests，7 个测试文件，运行时间 ≈ 6s。**
+**总计：74 tests，6 个测试文件。**
 
 ---
 
@@ -225,10 +223,11 @@ npm run test:watch
 }
 ```
 
-切换逻辑由 VueUse `useDark()` 驱动，自动管理：
-1. `<html>` 上的 `dark` class
+切换逻辑由 `useDarkMode()` 共享单例驱动（基于 VueUse `useDark` + `createSharedComposable`），自动管理：
+1. `<html>` 上的 `dark` / `light` class
 2. `localStorage['theme']` 持久化
 3. `md-editor-v3` 的 editor/preview 主题跟随
+4. 所有组件共享同一响应式状态，一处切换全局生效
 
 ---
 
