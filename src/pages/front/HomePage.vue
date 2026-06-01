@@ -3,7 +3,7 @@
   @description 前台首页，展示文章列表、分类筛选与搜索，支持分页；搜索关键字与分类筛选同步到 URL 查询参数。
 -->
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '../../stores/postStore'
 import { useCategoryStore } from '../../stores/categoryStore'
@@ -75,14 +75,14 @@ function handlePageChange(nextPage: number) {
   })
 }
 
-onMounted(() => {
-  try {
-    initBlogDemoData()
-  } catch (e) {
-    console.error('[HomePage] Failed to initialize demo data:', e)
-  }
-  categoryStore.fetchAll()
-})
+// 同步初始化 demo 数据，确保 fetchList 执行前 localStorage 已有数据。
+// initBlogDemoData 内部有幂等保护，重复调用安全。
+try {
+  initBlogDemoData()
+} catch (e) {
+  console.error('[HomePage] Failed to initialize demo data:', e)
+}
+categoryStore.fetchAll()
 
 watch(() => route.query, parseQueryParams, { immediate: true })
 </script>
