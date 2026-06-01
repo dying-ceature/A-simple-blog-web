@@ -4,6 +4,10 @@
 -->
 <script setup lang="ts">
 import { onErrorCaptured, ref } from 'vue'
+import { useDarkMode } from './composables/useDarkMode'
+
+// 在应用启动时立即初始化主题，确保在任何子组件渲染前应用正确的 dark/light class
+useDarkMode()
 
 const error = ref<Error | null>(null)
 
